@@ -64,10 +64,10 @@ type ActiveJwkEdge {
 
 type Address implements IOwner {
 	"""
-	Similar behavior to the `transactionBlockConnection` in Query but
-	supports additional `AddressTransactionBlockRelationship` filter
+	Similar behavior to the `transactionBlocks` in Query but supporting the additional
+	`AddressTransactionBlockRelationship` filter, which defaults to `SIGN`.
 	"""
-	transactionBlockConnection(first: Int, after: String, last: Int, before: String, relation: AddressTransactionBlockRelationship, filter: TransactionBlockFilter): TransactionBlockConnection
+	transactionBlocks(first: Int, after: String, last: Int, before: String, relation: AddressTransactionBlockRelationship, filter: TransactionBlockFilter): TransactionBlockConnection!
 	address: SuiAddress!
 	objectConnection(first: Int, after: String, last: Int, before: String, filter: ObjectFilter): ObjectConnection
 	balance(type: String): Balance
@@ -117,17 +117,9 @@ enum AddressTransactionBlockRelationship {
 	"""
 	SIGN
 	"""
-	Transactions that transferred objects from this address
-	"""
-	SENT
-	"""
 	Transactions that sent objects to this addres
 	"""
 	RECV
-	"""
-	Transactions that were paid for by this address either as a sender or as a sponsor
-	"""
-	PAID
 }
 
 type AuthenticatorStateCreateTransaction {
@@ -367,7 +359,7 @@ type Checkpoint {
 	"""
 	Transactions in this checkpoint.
 	"""
-	transactionBlockConnection(first: Int, after: String, last: Int, before: String, filter: TransactionBlockFilter): TransactionBlockConnection
+	transactionBlocks(first: Int, after: String, last: Int, before: String, filter: TransactionBlockFilter): TransactionBlockConnection!
 }
 
 type CheckpointConnection {
@@ -723,7 +715,7 @@ type Epoch {
 	"""
 	The epoch's corresponding transaction blocks
 	"""
-	transactionBlockConnection(first: Int, after: String, last: Int, before: String, filter: TransactionBlockFilter): TransactionBlockConnection
+	transactionBlocks(first: Int, after: String, last: Int, before: String, filter: TransactionBlockFilter): TransactionBlockConnection!
 }
 
 type Event {
@@ -2041,7 +2033,7 @@ type Query {
 	"""
 	coinConnection(first: Int, after: String, last: Int, before: String, type: String): CoinConnection
 	checkpoints(first: Int, after: String, last: Int, before: String): CheckpointConnection!
-	transactionBlockConnection(first: Int, after: String, last: Int, before: String, filter: TransactionBlockFilter): TransactionBlockConnection
+	transactionBlocks(first: Int, after: String, last: Int, before: String, filter: TransactionBlockFilter): TransactionBlockConnection!
 	events(first: Int, after: String, last: Int, before: String, filter: EventFilter): EventConnection!
 	objectConnection(first: Int, after: String, last: Int, before: String, filter: ObjectFilter): ObjectConnection
 	"""
@@ -2655,8 +2647,6 @@ type TransactionBlockEffects {
 }
 
 input TransactionBlockFilter {
-	package: SuiAddress
-	module: String
 	function: String
 	"""
 	An input filter selecting for either system or programmable transactions.
@@ -2666,9 +2656,7 @@ input TransactionBlockFilter {
 	atCheckpoint: Int
 	beforeCheckpoint: Int
 	signAddress: SuiAddress
-	sentAddress: SuiAddress
 	recvAddress: SuiAddress
-	paidAddress: SuiAddress
 	inputObject: SuiAddress
 	changedObject: SuiAddress
 	transactionIds: [String!]
